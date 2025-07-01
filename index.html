@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Product Selector</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 30px; max-width: 600px; }
+    .input-group { margin-top: 10px; }
+    #results { margin-top: 15px; }
+    #results2 { margin-top: 15px; }
+    label { display: inline-block; width: 250px; }
+    input[type="number"] { width: 100px; }
+  </style>
+</head>
+<body>
+
+  <h2>Product Selector</h2>
+
+  <div class="input-group">
+    <label for="application">Select Application:</label>
+    <select id="application" onchange="handleAppChange()">
+      <option value="">-- Choose Application --</option>
+      <!-- <option value="Fan">Fan</option> -->
+      <option value="Pump">Pump</option>
+    </select>
+  </div>
+
+  <!-- Pump inputs -->
+  <div id="pumpInputs" style="display:none" class="input-group">
+    <label for="boreDiameter">Bore Diameter (in):</label>
+    <input type="number" id="boreDiameter" /><br/>
+    <label for="rodDiameter">Bore Diameter (in):</label>
+    <input type="number" id="rodDiameter" /><br/>
+    <label for="strokeLength">Stroke Length (in):</label>
+    <input type="number" id="strokeLength" /><br/><br/>
+
+    <label for="clampPressure">Clamp Pressure (bar):</label>
+    <input type="number" id="clampPressure" /><br/>
+    <label for="timeOfStroke">Clamping Time of Stroke (s):</label>
+    <input type="number" id="timeOfStroke" /><br/>
+    <label for="clampFlowRate">Clamp Flow Rate (l/min):</label>
+    <input type="number" id="clampFlowRate" /><br/><br/>
+
+    <label for="rpm">Pump Speed (RPM):</label>
+    <input type="number" id="rpm" /><br/>
+    <label for="motorEfficiency">Motor Efficiency (xx%):</label>
+    <input type="number" id="motorEfficiency" /><br/><br/>
+    
+    <label for="safetyFactor">Safety Factor (x.x):</label>
+    <input type="number" id="safetyFactor" /><br/><br/>
+
+    <button onclick="findClosestPump()">Find Closest Pump</button><br/><br/>
+  </div>
+
+
+  <!-- Fan inputs
+  <div id="fanInputs" style="display:none;" class="input-group">
+    <label for="fanFlowInput">Flow (min):</label>
+    <input type="number" id="fanFlowInput" oninput="filterFans()" />
+    <br/><br/>
+    <label for="fanPressureInput">Pressure (min):</label>
+    <input type="number" id="fanPressureInput" oninput="filterFans()" />
+  </div> -->
+
+  <div id="results"></div>
+
+  <div id="results2"></div>
+
+  <!-- PapaParse CSV parser -->
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <!-- Your custom JavaScript -->
+  <script src="main.js"></script>
+  <script src="formulas.js"></script>
+</body>
+</html>

@@ -1,0 +1,7 @@
+Application,Model,Flow,Pressure
+Fan,Model A,1000,200
+Fan,Model B,500,150
+Fan,Model C,300,120
+Pump,Model P1,70,110
+Pump,Model P2,30,80
+Pump,Model P3,50,90
