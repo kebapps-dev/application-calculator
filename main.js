@@ -96,7 +96,7 @@ function findClosestPump() {
     `;
     
 } else {
-    resultsDiv.innerHTML = "<p>No pump product data available.</p>";
+    resultsDiv.innerHTML = "<p>No sufficient pump product available.</p>";
 }
   selectedPumpname = closestProduct ? closestProduct.Pumpname : "Unknown";
   selectedPumpdisplacement = closestProduct ? closestProduct["Specific volume Vth [cm3/U]"] : "Unknown";
@@ -206,7 +206,8 @@ function findClosestMotor() {
 
   if (closestProduct) {
     resultsDiv.innerHTML = `
-      <p><strong>Closest Motor Product to required torque: ${motortorque.toFixed(2)} Nm:</strong></p>
+      <p><strong>Closest Motor Product to required torque: ${motortorque.toFixed(2)} Nm <br/> 
+      and required speed ${motorspeed.toFixed(2)} RPM: </strong></p>
       <ul>
         <li><strong>Model:</strong> ${closestProduct.Motorname}</li>
         <li><strong>Maximum Torque at 20C [Nm]:</strong> ${closestProduct["Peak torque 20C [Nm]"]}</li>
@@ -214,6 +215,6 @@ function findClosestMotor() {
       </ul>
     `;
 } else {
-    resultsDiv.innerHTML = "<p>No motor product data available.</p>";
+    resultsDiv.innerHTML = "<p>No sufficient motor product available.</p>";
 }
 }
