@@ -17,7 +17,7 @@ function handleAppChange() {
 
 function loadSelectedScript() {
       const select = document.getElementById("application");
-      const selectedFile = select.value + ".js"; // Assuming the script files are named like "Fan.js", "Pump.js", etc.
+      const selectedFile = select.value.toLowerCase() + ".js"; // Assuming the script files are named like "Fan.js", "Pump.js", etc.
 
       if (!selectedFile) return;
 
@@ -27,7 +27,7 @@ function loadSelectedScript() {
         return;
       }
 
-      const script = document.createElement("script").toLowerCase();
+      const script = document.createElement("script");
       script.src = selectedFile;
       script.type = "text/javascript";
       script.onload = () => console.log(`Loaded: ${selectedFile}`);
