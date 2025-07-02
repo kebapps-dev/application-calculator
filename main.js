@@ -27,7 +27,7 @@ function loadSelectedScript() {
         return;
       }
 
-      const script = document.createElement("script");
+      const script = document.createElement("script").toLowerCase();
       script.src = selectedFile;
       script.type = "text/javascript";
       script.onload = () => console.log(`Loaded: ${selectedFile}`);
