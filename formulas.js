@@ -10,4 +10,48 @@ const formulas = {
   pumpclampingforce: (clampPressure, clamparea) => clampPressure * clamparea,
   motortorque: (selectedPumpDisplacement,clampPressure, volefficiency) => (selectedPumpDisplacement * clampPressure ) / (20 * Math.PI * volefficiency), //Nm
   motorspeed: (clampingFlowRate, selectedPumpDisplacement,volefficiency) => (clampingFlowRate * 1000 * volefficiency) / selectedPumpDisplacement, //rpm
+
+  //lift calculations
+  angularspeed: (maxSpeed, drumDiameter) => (maxSpeed * 60) / (Math.PI * (drumDiameter/1000)), // rp
+  forcegravity: (mass, gravity = 9.81) => mass * gravity, // N
+  drumtorque: (forcegravity, drumDiameter) => forcegravity * (drumDiameter/2000), // Nm
+
+  peakacceleration: (maxSpeed, accelDecelTime) => maxSpeed / accelDecelTime, // m/s^2
+  peakdrumtorque: (forcegravity, drumDiameter, mass, peakacceleration) => (drumDiameter/2000)*(forcegravity + (mass*(peakacceleration))), // Nm
+
+  motorpowerkw: (torque, angularspeed) => (torque * angularspeed) /1000, // kW
+  motorpowerhp: (torque, angularspeed) => (torque * angularspeed) / 745.7, // hp
+
 };
+
+const rotarytableformulas = {
+  //https://www.kebamerica.com/blog/how-do-i-size-a-motor-for-my-application-rotary-index-table/
+  maxangularspeed: (rotationalMoveDistance, totalMoveTime, accelTime, decelTime, gearboxRatio) => 
+    gearboxRatio * (rotationalMoveDistance / (totalMoveTime - 0.5*accelTime - 0.5*decelTime)), // RPM
+  maxrotationalspeed: (maxAngularSpeed, gearboxRatio) =>
+    maxAngularSpeed * 60 * gearboxRatio / (2 * Math.PI), // RPM
+  
+  motoracceleration: (maxRotationalspeed, accelTime, gearboxRatio) => 
+    maxRotationalspeed / accelTime, // RPM/s
+  
+  motordeceleration: (maxRotationalspeed, decelTime) => 
+    maxRotationalspeed / decelTime, // RPM/s
+  
+  rotaryTableInertia: (massIndexTable, radiusIndexTable) => 
+    0.5 * massIndexTable * (radiusIndexTable ** 2), 
+  totalSystemInertia: (rotaryTableInertia, loadInertia, gearboxRatio) =>
+    (rotaryTableInertia + loadInertia) / (gearboxRatio ** 2), 
+
+  torqueConstantFriction: (frictionTorque, gearboxRatio) => frictionTorque / gearboxRatio, // Nm
+  torqueRequiredAcceleration: (totalSystemInertia, motorAcceleration, torqueConstantFriction) =>
+    (totalSystemInertia * motorAcceleration) + torqueConstantFriction, // Nm
+  torqueRequiredDeceleration: (totalSystemInertia, motorDeceleration, torqueConstantFriction) =>
+    (totalSystemInertia * motorDeceleration) + torqueConstantFriction, // Nm
+  torqueRequiredConstantSpeed: (torqueConstantFriction) => 
+    torqueConstantFriction, // Nm
+  
+  constantRunTime: (moveTime, accelTime, decelTime) =>
+    moveTime - accelTime - decelTime, // s
+  torqueRmsMotor: (torqueRequiredAcceleration, torqueRequiredDeceleration, torqueRequiredConstantSpeed, accelTime, decelTime, constantRunTime, moveTime, dwellTime) =>
+    Math.sqrt((((torqueRequiredAcceleration ** 2) * accelTime) + ((torqueRequiredDeceleration ** 2) * decelTime) + ((torqueRequiredConstantSpeed ** 2) * constantRunTime)) / (dwellTime + moveTime)), // Nm^2
+  };

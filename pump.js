@@ -84,61 +84,6 @@ function findClosestPump() {
   findClosestMotor(); // Automatically find closest motor after pump selection
 }
 
-// Live filter for fans based on minimum flow and pressure
-function filterFans() {
-  const flowMin = parseFloat(document.getElementById("fanFlowInput").value);
-  const pressureMin = parseFloat(document.getElementById("fanPressureInput").value);
-  const resultsDiv = document.getElementById("results");
-
-  if (productData.length === 0) {
-    resultsDiv.innerHTML = "<p>Product data not loaded yet.</p>";
-    return;
-  }
-
-  // Filter fans by minimum flow and pressure (if inputs provided)
-  let filteredFans = productData.filter(product => {
-    if (product.Application !== "Fan") return false;
-
-    const flowVal = parseFloat(product.Flow);
-    const pressureVal = parseFloat(product.Pressure);
-
-    let flowCheck = true;
-    let pressureCheck = true;
-
-    if (!isNaN(flowMin)) {
-      flowCheck = flowVal >= flowMin;
-    }
-    if (!isNaN(pressureMin)) {
-      pressureCheck = pressureVal >= pressureMin;
-    }
-
-    return flowCheck && pressureCheck;
-  });
-
-  if (filteredFans.length === 0) {
-    resultsDiv.innerHTML = "<p>No fan products match your criteria.</p>";
-    return;
-  }
-
-  // Display filtered fans as a table
-  let html = `<p><strong>Matching Fans:</strong></p>
-              <table border="1" cellpadding="5" cellspacing="0">
-                <thead>
-                  <tr><th>Model</th><th>Flow</th><th>Pressure</th></tr>
-                </thead><tbody>`;
-
-  filteredFans.forEach(fan => {
-    html += `<tr>
-              <td>${fan.Model}</td>
-              <td>${fan.Flow}</td>
-              <td>${fan.Pressure}</td>
-            </tr>`;
-  });
-
-  html += "</tbody></table>";
-  resultsDiv.innerHTML = html;
-}
-
 // Find closest motor product based on pump selection
 function findClosestMotor() {
   const resultsDiv = document.getElementById("results2");
