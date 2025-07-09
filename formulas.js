@@ -21,7 +21,6 @@ const formulas = {
 
   motorpowerkw: (torque, angularspeed) => (torque * angularspeed) /1000, // kW
   motorpowerhp: (torque, angularspeed) => (torque * angularspeed) / 745.7, // hp
-
 };
 
 const rotarytableformulas = {
@@ -54,4 +53,16 @@ const rotarytableformulas = {
     moveTime - accelTime - decelTime, // s
   torqueRmsMotor: (torqueRequiredAcceleration, torqueRequiredDeceleration, torqueRequiredConstantSpeed, accelTime, decelTime, constantRunTime, moveTime, dwellTime) =>
     Math.sqrt((((torqueRequiredAcceleration ** 2) * accelTime) + ((torqueRequiredDeceleration ** 2) * decelTime) + ((torqueRequiredConstantSpeed ** 2) * constantRunTime)) / (dwellTime + moveTime)), // Nm^2
+  };
+
+
+  const conveyorformulas = {
+    frictionalForce: (loadMass, frictionCoefficient) => loadMass * frictionCoefficient * 9.81, // N
+    inclineForce: (loadMass, inclineAngle) => loadMass * 9.81 * Math.abs(Math.sin(inclineAngle)), // N
+    totalForce: (frictionalForce, inclineForce) => frictionalForce + inclineForce, // N
+    linearToRotationalSpeed: (beltSpeed, rollerDiameter) => (beltSpeed * 1000) / (Math.PI * rollerDiameter), // RPM
+  
+    requiredMotorPowerKw: (totalForce, beltSpeed) => (totalForce * beltSpeed) / 1000, // kW
+    requiredMotorPowerHp: (totalForce, beltSpeed) => (totalForce * beltSpeed) / 745.7, // hp
+    requiredTorque: (totalForce, rollerDiameter) => (totalForce * rollerDiameter) / 2, // Nm
   };

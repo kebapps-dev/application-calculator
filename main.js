@@ -3,6 +3,7 @@ function handleAppChange() {
   const pumpDiv = document.getElementById("pumpInputs");
   const liftDiv = document.getElementById("liftInputs");
   const rotaryTableDiv = document.getElementById("rotaryTableInputs");
+  const conveyorDiv = document.getElementById("conveyorInputs");
   const resultsDiv = document.getElementById("results");
   const resultsDiv2 = document.getElementById("results2");
 
@@ -13,18 +14,27 @@ function handleAppChange() {
     pumpDiv.style.display = "block";
     liftDiv.style.display = "none";
     rotaryTableDiv.style.display = "none";
+    conveyorDiv.style.display = "none";
   } else if (app === "Lift") {
     pumpDiv.style.display = "none";
     liftDiv.style.display = "block";
     rotaryTableDiv.style.display = "none";
+    conveyorDiv.style.display = "none";
   } else if (app === "Rotarytable") {
     pumpDiv.style.display = "none";
     liftDiv.style.display = "none";
     rotaryTableDiv.style.display = "block";
+    conveyorDiv.style.display = "none";
+  } else if (app === "Conveyor") {
+    pumpDiv.style.display = "none";
+    liftDiv.style.display = "none";
+    rotaryTableDiv.style.display = "none";
+    conveyorDiv.style.display = "block";
   }else{
     pumpDiv.style.display = "none";
     liftDiv.style.display = "none";
     rotaryTableDiv.style.display = "none";
+    conveyorDiv.style.display = "none";
   }
     loadSelectedScript();
 }
@@ -81,6 +91,14 @@ function loadGenericData(Application) {
       document.getElementById("gearboxRatioRotary").value = "10";
       document.getElementById("loadInertia").value = "0.1";  
       document.getElementById("frictionTorque").value = "0.5";
+    }
+    if (Application === "Conveyor") {
+      document.getElementById("conveyorLength").value = "10";
+      document.getElementById("conveyorInclineAngle").value = "30";
+      document.getElementById("beltSpeed").value = "0.5";
+      document.getElementById("loadMass").value = "200";
+      document.getElementById("rollerDiameter").value = ".2";
+      document.getElementById("frictionCoefficient").value = ".03";
     }
     console.log("Generic data loaded for:", Application);
 }
