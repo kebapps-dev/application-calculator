@@ -4,9 +4,13 @@ function handleAppChange() {
   const liftDiv = document.getElementById("liftInputs");
   const rotaryTableDiv = document.getElementById("rotaryTableInputs");
   const conveyorDiv = document.getElementById("conveyorInputs");
+  const genericRotaryDiv = document.getElementById("genericRotaryInputs");
+  const blowerDiv = document.getElementById("blowerInputs");
+  const spindleDiv = document.getElementById("spindleInputs");
   const resultsDiv = document.getElementById("results");
   const resultsDiv2 = document.getElementById("results2");
-
+  const savedConfigBtn = document.getElementById("saveConfigBtn");
+  const clearSavedConfigsBtn = document.getElementById("clearSavedConfigsBtn");
   resultsDiv.innerHTML = ""; // clear previous results
   resultsDiv2.innerHTML = ""; // clear previous results
 
@@ -15,28 +19,87 @@ function handleAppChange() {
     liftDiv.style.display = "none";
     rotaryTableDiv.style.display = "none";
     conveyorDiv.style.display = "none";
+    genericRotaryDiv.style.display = "none";
+    blowerDiv.style.display = "none";
+    spindleDiv.style.display = "none";
+    clearSavedConfigsBtn.style.display = "inline-block";
+    savedConfigBtn.style.display = "inline-block";
   } else if (app === "Lift") {
     pumpDiv.style.display = "none";
     liftDiv.style.display = "block";
     rotaryTableDiv.style.display = "none";
     conveyorDiv.style.display = "none";
+    genericRotaryDiv.style.display = "none";
+    blowerDiv.style.display = "none";
+    spindleDiv.style.display = "none";
+    clearSavedConfigsBtn.style.display = "inline-block";
+    savedConfigBtn.style.display = "inline-block";
   } else if (app === "Rotarytable") {
     pumpDiv.style.display = "none";
     liftDiv.style.display = "none";
     rotaryTableDiv.style.display = "block";
     conveyorDiv.style.display = "none";
+    genericRotaryDiv.style.display = "none";
+    blowerDiv.style.display = "none";
+    spindleDiv.style.display = "none";
+    clearSavedConfigsBtn.style.display = "inline-block";
+    savedConfigBtn.style.display = "inline-block";
   } else if (app === "Conveyor") {
     pumpDiv.style.display = "none";
     liftDiv.style.display = "none";
     rotaryTableDiv.style.display = "none";
     conveyorDiv.style.display = "block";
+    genericRotaryDiv.style.display = "none";
+    blowerDiv.style.display = "none";
+    spindleDiv.style.display = "none";
+    clearSavedConfigsBtn.style.display = "inline-block";
+    savedConfigBtn.style.display = "inline-block";
+  }  else if (app === "Genericrotary") {
+    pumpDiv.style.display = "none";
+    liftDiv.style.display = "none";
+    rotaryTableDiv.style.display = "none";
+    conveyorDiv.style.display = "none";
+    genericRotaryDiv.style.display = "block";
+    blowerDiv.style.display = "none";
+    spindleDiv.style.display = "none";
+    clearSavedConfigsBtn.style.display = "inline-block";
+    savedConfigBtn.style.display = "inline-block";
+  } else if (app === "Blower") {
+    pumpDiv.style.display = "none";
+    liftDiv.style.display = "none";
+    rotaryTableDiv.style.display = "none";
+    conveyorDiv.style.display = "none";
+    genericRotaryDiv.style.display = "none";
+    blowerDiv.style.display = "block";
+    spindleDiv.style.display = "none";
+    clearSavedConfigsBtn.style.display = "inline-block";
+    savedConfigBtn.style.display = "inline-block";
+  } else if (app === "Spindle") {
+    pumpDiv.style.display = "none";
+    liftDiv.style.display = "none";
+    rotaryTableDiv.style.display = "none";
+    conveyorDiv.style.display = "none";
+    genericRotaryDiv.style.display = "none";
+    blowerDiv.style.display = "none";
+    spindleDiv.style.display = "block";
+    clearSavedConfigsBtn.style.display = "inline-block";
+    savedConfigBtn.style.display = "inline-block";
   }else{
     pumpDiv.style.display = "none";
     liftDiv.style.display = "none";
     rotaryTableDiv.style.display = "none";
     conveyorDiv.style.display = "none";
+    genericRotaryDiv.style.display = "none";
+    blowerDiv.style.display = "none";
+    spindleDiv.style.display = "none";
+    savedConfigBtn.style.display = "none";
+    clearSavedConfigsBtn.style.display = "none";
+    savedConfigBtn.style.display = "none";
   }
     loadSelectedScript();
+    
+    // Show or hide the Save Configuration button
+    document.getElementById("saveConfigBtn").style.display = app ? "block" : "none";
 }
 
 function loadSelectedScript() {
@@ -100,5 +163,77 @@ function loadGenericData(Application) {
       document.getElementById("rollerDiameter").value = ".2";
       document.getElementById("frictionCoefficient").value = ".03";
     }
-    console.log("Generic data loaded for:", Application);
+    if (Application === "Genericrotary") {
+      document.getElementById("genericRequiredSpeed").value = "1000";  
+      document.getElementById("genericAccelTime").value = "2";
+      document.getElementById("genericRunTime").value = "4";
+      document.getElementById("genericDecelTime").value = "2";
+      document.getElementById("genericRestTime").value = "2";
+      document.getElementById("genericMomentOfInertia").value = "25";
+      document.getElementById("genericFrictionTorque").value = "25";
+      document.getElementById("genericThermalMarginPercent").value = "20"; // 20% thermal margin
+    }
+    if (Application === "Blower") {
+      document.getElementById("blowerAirflow").value = "3000";
+      document.getElementById("blowerPressure").value = "4";
+      document.getElementById("blowerFanEff").value = "65";
+      document.getElementById("blowerMotorEff").value = "90";
+      document.getElementById("blowerRequiredSpeed").value = "1800";
+    }
+      console.log("Generic data loaded for:", Application);
+}
+
+function saveCurrentConfiguration() {
+    // Get selected application
+    const applicationSelect = document.getElementById("application");
+    const selectedAppText = applicationSelect.options[applicationSelect.selectedIndex].text;
+
+    // Get current date and time
+    const now = new Date();
+    const dateTimeString = now.toLocaleString();
+
+    // Find the visible input-group div (excluding the application select group)
+    const inputGroups = document.querySelectorAll('.input-group');
+    let activeGroup = null;
+    inputGroups.forEach(group => {
+        // Skip the first input-group (application select)
+        if (group.style.display !== "none" && group.querySelector('input')) {
+            activeGroup = group;
+        }
+    });
+    if (!activeGroup) {
+        alert("No active configuration to save.");
+        return;
+    }
+
+    // Get all input values in the active group
+    const inputs = activeGroup.querySelectorAll('input, select');
+    let configText = `Saved: ${dateTimeString}\nApplication: ${selectedAppText}\nConfiguration:\n`;
+    inputs.forEach(input => {
+        const label = activeGroup.querySelector(`label[for="${input.id}"]`);
+        const labelText = label ? label.textContent : input.id;
+        configText += `${labelText} ${input.value}\n`;
+    });
+
+    // Get the results text
+    const resultsDiv = document.getElementById("results");
+    const results2Div = document.getElementById("results2");
+    let resultsText = "";
+    if (resultsDiv && resultsDiv.innerText.trim()) {
+        resultsText += "\nResults:\n" + resultsDiv.innerText.trim() + "\n";
+    }
+    if (results2Div && results2Div.innerText.trim()) {
+        resultsText += "\nResults 2:\n" + results2Div.innerText.trim() + "\n";
+    }
+
+    // Combine and display in savedConfigs
+    const savedConfigsDiv = document.getElementById("savedConfigs");
+    const configBlock = document.createElement("pre");
+    configBlock.textContent = configText + resultsText + "\n----------\n";
+    savedConfigsDiv.appendChild(configBlock);
+}
+
+clearSavedConfigurations = () => {
+  const savedConfigsDiv = document.getElementById("savedConfigs");
+  savedConfigsDiv.innerHTML = "";
 }

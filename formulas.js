@@ -66,3 +66,102 @@ const rotarytableformulas = {
     requiredMotorPowerHp: (totalForce, beltSpeed) => (totalForce * beltSpeed) / 745.7, // hp
     requiredTorque: (totalForce, rollerDiameter) => (totalForce * rollerDiameter) / 2, // Nm
   };
+
+  const genericrotaryformulas = {
+    angularSpeed: (requiredSpeedRPM) => (2 * Math.PI * requiredSpeedRPM) / 60, // rad/s
+    torqueRequiredAcceleration: (momentOfInertia, angularSpeed, accelTime) => angularSpeed * momentOfInertia / accelTime, // Nm
+    torqueRequiredDeceleration: (momentOfInertia, angularSpeed, decelTime) => angularSpeed * momentOfInertia / decelTime, // Nm
+    requiredMotorPowerKw : (torque, angularSpeed) => (torque * angularSpeed) / 1000, // kW
+    requiredMotorPowerHp : (torque, angularSpeed) => (torque * angularSpeed) / 745.7, // hp
+  };
+
+  function calculateContinuousMotorRating(params) {
+  const {
+    inertia,             // kg·m²
+    targetRPM,           // RPM
+    accelTime,           // s
+    runTime,             // s
+    decelTime,           // s
+    restTime,            // s
+    frictionTorque,      // Nm
+    thermalMarginPercent // e.g., 20 = 20%
+  } = params;
+
+  const totalCycleTime = accelTime + runTime + decelTime + restTime;
+  const g = 9.81;
+
+  // Convert target RPM to rad/s
+  const omega = (2 * Math.PI * targetRPM) / 60;
+
+  // Acceleration torque = J * α = J * ω / t
+  const accelTorque = inertia * (omega / accelTime);
+
+  // RMS Torque Calculation
+  const rmsTorque = Math.sqrt(
+    (
+      (accelTorque ** 2 * accelTime) +
+      (frictionTorque ** 2 * runTime) +
+      (frictionTorque ** 2 * decelTime) +
+      (0 ** 2 * restTime)
+    ) / totalCycleTime
+  );
+
+  // Continuous power (W)
+  const contPower = rmsTorque * omega;
+
+  // Add thermal margin
+  const contPowerWithMargin = contPower * (1 + thermalMarginPercent / 100);
+
+  return {
+    omega: omega.toFixed(2) + ' rad/s',
+    accelTorque: accelTorque.toFixed(2) + ' Nm',
+    rmsTorque: rmsTorque.toFixed(2) + ' Nm',
+    contPower: (contPower / 1000).toFixed(2) + ' kW',
+    contPowerWithMargin: (contPowerWithMargin / 1000).toFixed(2) + ' kW',
+    contPowerHP: (contPower / 745.7).toFixed(2) + ' HP',
+    contPowerHPWithMargin: (contPowerWithMargin / 745.7).toFixed(2) + ' HP'
+  };
+}
+
+function sizeBlowerMotor(params) {
+  const {
+    airflowCFM,             // CFM
+    staticPressureInH2O,           // inH2O
+    fanEfficiencyPercent,           // %
+    motorEfficiencyPercent,             // %
+    rpm = null,           // RPM (optional, for torque calculation)
+  } = params;
+ 
+  // Convert inputs to SI units
+  const airflow = airflowCFM * 0.0004719;           // m³/s
+  const pressure = staticPressureInH2O * 249.1;     // Pa
+  const fanEff = fanEfficiencyPercent / 100;        // decimal
+  const motorEff = motorEfficiencyPercent / 100;    // decimal
+
+  // Calculate fan power (W)
+  const fanPower = (airflow * pressure) / fanEff;
+
+  // Motor shaft power adjusted for efficiency
+  const motorPower = fanPower / motorEff;
+
+  // Convert to horsepower
+  const motorPowerHP = motorPower / 745.7;
+
+  // Suggest next standard motor size (rounded up)
+  const suggestedHP = Math.ceil(motorPowerHP);
+
+  // Optional torque calculation (only if RPM is provided)
+  let torqueNm = null;
+  if (rpm && rpm > 0) {
+    const omega = (2 * Math.PI * rpm) / 60;  // rad/s
+    torqueNm = motorPower / omega;
+  }
+
+  // Return results
+  return {
+    fanPowerWatts: (fanPower/1000).toFixed(2) + ' kW',
+    motorPowerWatts: (motorPower/1000).toFixed(2) + ' kW',
+    motorPowerHP: motorPowerHP.toFixed(2) + '  HP',
+    torqueNm: torqueNm ? torqueNm.toFixed(2) + ' Nm': null
+  };
+}
