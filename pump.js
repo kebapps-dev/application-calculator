@@ -1,7 +1,8 @@
 let productData = [];
 let productData2 = [];
+
 // Load CSV data on page load
-Papa.parse("pumps.csv", {
+Papa.parse("product csv's/pumps.csv", {
   download: true,
   header: true,
   complete: function(results) {
@@ -9,7 +10,7 @@ Papa.parse("pumps.csv", {
     console.log("Product data loaded:", productData);
   }
 });
-Papa.parse("motors.csv", {
+Papa.parse("product csv's/motors.csv", {
   download: true,
   header: true,
   complete: function(results) {
@@ -22,7 +23,7 @@ Papa.parse("motors.csv", {
 
 
 // Find closest pump product based on flow input
-function findClosestPump() {
+function findClosestPumpMotor() {
   const resultsDiv = document.getElementById("results");
   const clamparea = formulas.clamparea(
     parseFloat(document.getElementById("boreDiameter").value), 
@@ -142,4 +143,7 @@ function findClosestMotor() {
 } else {
     resultsDiv.innerHTML = "<p>No sufficient motor product available.</p>";
 }
+}
+if (fastMode = "True") {
+  findClosestPumpMotor();
 }

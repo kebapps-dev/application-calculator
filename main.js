@@ -1,4 +1,21 @@
+document.addEventListener("DOMContentLoaded", function() {
+  document.getElementById("application").value = "Genericrotary";
+    // FAST MODE
+    handleAppChange(); 
+    setTimeout(() => {document.getElementById('loadGenericData').click();}, 100);
+    setTimeout(() => {document.getElementById('findClosestGenericRotaryMotor').click();}, 300);
+    showSizingSuggestions(document.getElementById("application").value);
+  document.getElementById("application").addEventListener("change", handleAppChange);
+
+  const toggle = document.getElementById("toggleRight");
+  const rightPanel = document.querySelector(".right");
+  toggle.addEventListener("change", function() {
+    rightPanel.style.display = toggle.checked ? "block" : "none";
+  });
+});
+
 function handleAppChange() {
+  console.log("Application changed, updating input groups...");
   const app = document.getElementById("application").value;
   const pumpDiv = document.getElementById("pumpInputs");
   const liftDiv = document.getElementById("liftInputs");
@@ -237,3 +254,155 @@ clearSavedConfigurations = () => {
   const savedConfigsDiv = document.getElementById("savedConfigs");
   savedConfigsDiv.innerHTML = "";
 }
+
+function addMathTooltip(equationLatex) {
+  return `
+    <span class="math-tooltip">
+      &#9432;
+      <span class="math-tooltiptext">\\(${equationLatex}\\)</span>
+    </span>
+  `;
+}
+
+const unitConversions = {
+  inertia: {
+    'kg·m²': 1,
+    'lb·ft²': 0.0421401,   // 1 lb·ft² = 0.0421401 kg·m²
+    'g·cm²': 1e-7,         // 1 g·cm² = 1e-7 kg·m²
+    'kg·cm²': 0.0001     // 1 kg·cm² = 0.0001 kg·m²
+  },
+  speed: {
+    'RPM': (value) => (2 * Math.PI * value) / 60, // rad/s
+    'rad/s': (value) => value,
+    'deg/s': (value) => (value * Math.PI) / 180, // rad/s
+    'Hz': (value) => (2 * Math.PI * value)       // rad/s
+  },
+  torque: {
+    'Nm': 1,
+    'lb·ft': 1.35582,       // 1 lb-ft = 1.35582 Nm
+    'lb·in': 0.113,         // 1 lb-in = 0.113 Nm
+    'oz·in': 0.00706155,    // 1 oz-in = 0.00706155 Nm
+    'kg·cm': 0.0980665      // 1 kg-cm = 0.0980665 Nm
+  }
+};
+
+function getConvertedValue(value, type, unit) {
+  const conv = unitConversions[type][unit];
+  return typeof conv === 'function' ? conv(value) : value * conv;
+}
+
+function showDoneMessage() {
+    const msg = document.getElementById("doneMessage");
+    msg.style.display = "inline";
+    setTimeout(() => {
+        msg.style.display = "none";
+    }, 1000); // Message disappears after 1 second
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+    // List all relevant input IDs for Generic Rotary
+    const rotaryInputs = [
+        "genericRequiredSpeed",
+        "genericSpeedUnit",
+        "genericAccelTime",
+        "genericRunTime",
+        "genericDecelTime",
+        "genericRestTime",
+        "genericMomentOfInertia",
+        "genericInertiaUnit",
+        "genericFrictionTorque",
+        "genericTorqueUnit",
+        "genericThermalMarginPercent"
+    ];
+
+    rotaryInputs.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            // Only update on 'change' (for selects) or 'blur' (for inputs), or Enter key
+            if (el.tagName === "SELECT") {
+                el.addEventListener('change', () => {
+                    const app = document.getElementById("application");
+                    if (app && app.value === "Genericrotary") {
+                        findClosestGenericRotaryMotor();
+                    }
+                });
+            } else {
+                el.addEventListener('blur', () => {
+                    const app = document.getElementById("application");
+                    if (app && app.value === "Genericrotary") {
+                        findClosestGenericRotaryMotor();
+                    }
+                });
+                el.addEventListener('keydown', (e) => {
+                    if (e.key === "Enter") {
+                        const app = document.getElementById("application");
+                        if (app && app.value === "Genericrotary") {
+                            findClosestGenericRotaryMotor();
+                        }
+                    }
+                });
+            }
+        }
+    });
+});
+
+function showSizingSuggestions(application) {
+    const howToSizeDiv = document.getElementById("howToSize");
+    let html = "";
+    switch (application) {
+        case "Pump":
+            html = `<b>Pump Sizing Tips:</b><ul>
+                <li>Ensure the pump speed (RPM) matches the required flow and pressure.</li>
+                <li>Check motor efficiency and safety factor for margin.</li>
+                <li>Verify bore, rod, and stroke dimensions for hydraulic sizing.</li>
+            </ul>`;
+            break;
+        case "Lift":
+            html = `<b>Lift Sizing Tips:</b><ul>
+                <li>Calculate load weight and lift height for required torque.</li>
+                <li>Include gearbox ratio and drum diameter for mechanical advantage.</li>
+                <li>Consider acceleration/deceleration time for motor selection.</li>
+            </ul>`;
+            break;
+        case "Rotarytable":
+            html = `<b>Rotary Table Sizing Tips:</b><ul>
+                <li>Determine move distance and time for speed and acceleration.</li>
+                <li>Include mass and radius for inertia calculations.</li>
+                <li>Account for friction torque and dwell time in duty cycle.</li>
+            </ul>`;
+            break;
+        case "Conveyor":
+            html = `<b>Conveyor Sizing Tips:</b><ul>
+                <li>Calculate belt speed and load mass for power requirements.</li>
+                <li>Consider incline angle and friction coefficient.</li>
+                <li>Check roller diameter for correct speed conversion.</li>
+            </ul>`;
+            break;
+        case "Genericrotary":
+            html = `<b>Generic Rotary Sizing Tips:</b><ul>
+                <li>Ensure the rated motor torque is less than the RMS torque.</li>
+                <li>Ensure the rated motor max torque less than accel torque.</li>
+                <li>Ensure the rated motor speed meets the required speed</li>
+                <li>Use thermal margin for continuous operation safety.</li>
+            </ul>`;
+            break;
+        case "Blower":
+            html = `<b>Blower Sizing Tips:</b><ul>
+                <li>Set airflow and pressure for required blower performance.</li>
+                <li>Include fan and motor efficiency for accurate power sizing.</li>
+                <li>Check required speed for compatibility with selected motor.</li>
+            </ul>`;
+            break;
+        default:
+            html = "";
+    }
+    howToSizeDiv.innerHTML = html;
+}
+
+// Example usage: call this when application changes
+document.getElementById("application").addEventListener("change", function(e) {
+    showSizingSuggestions(e.target.value);
+});
+
+
+
